@@ -17,12 +17,6 @@ class Oystercard
     self.balance += amount
   end
 
-  def deduct(amount)
-    # raise "Maximum balance is #{MAX_BALANCE}." if over_maximum?(amount)
-
-    self.balance -= amount
-  end
-
   def touch_in
     raise "Insufficient funds to travel." if insufficient_balance?
 
@@ -31,6 +25,7 @@ class Oystercard
 
   def touch_out
     self.in_journey = false
+    deduct(MIN_FARE)
   end
 
   def in_journey?
@@ -38,6 +33,10 @@ class Oystercard
   end
 
   private
+
+  def deduct(amount)
+    self.balance -= amount
+  end
 
   def insufficient_balance?
     self.balance < MIN_FARE
