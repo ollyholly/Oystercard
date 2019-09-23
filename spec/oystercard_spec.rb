@@ -20,7 +20,14 @@ describe Oystercard do
     it 'raises an error when trying to top up and balance goes over #{max_balance}' do
       card.top_up(max_balance)
       message = "Maximum balance is #{max_balance}."
-      expect{ card.top_up(1) }.to raise_error message
+      expect { card.top_up(1) }.to raise_error message
+    end
+  end
+
+  describe '#deduct' do
+    it 'deducts money to the card' do
+      card.top_up(10)
+      expect { card.deduct(5) }.to change { card.balance }.by -5
     end
   end
 end

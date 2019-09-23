@@ -10,9 +10,15 @@ class Oystercard
   end
 
   def top_up(amount)
-    fail "Maximum balance is #{MAX_BALANCE}." if over_maximum?(amount)
+    raise "Maximum balance is #{MAX_BALANCE}." if over_maximum?(amount)
 
     self.balance += amount
+  end
+  
+  def deduct(amount)
+    # raise "Maximum balance is #{MAX_BALANCE}." if over_maximum?(amount)
+
+    self.balance -= amount
   end
 
   private
