@@ -4,6 +4,7 @@ class Oystercard
   attr_accessor :balance, :in_journey
 
   MAX_BALANCE = 90
+  MIN_FARE = 1 #min_fare would be equivalent to min_balance
 
   def initialize
     @balance = 0
@@ -23,6 +24,8 @@ class Oystercard
   end
 
   def touch_in
+    raise "Insufficient funds to travel." if insufficient_balance?
+
     self.in_journey = true
   end
 
@@ -35,6 +38,10 @@ class Oystercard
   end
 
   private
+
+  def insufficient_balance?
+    self.balance < MIN_FARE
+  end
 
   def over_maximum?(amount)
     self.balance + amount > MAX_BALANCE
