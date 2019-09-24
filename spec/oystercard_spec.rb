@@ -6,7 +6,9 @@ describe Oystercard do
   subject(:card) { described_class.new }
   let(:max_balance) { Oystercard::MAX_BALANCE }
   let(:min_fare) { Oystercard::MIN_FARE }
-  let(:station_name) { double(:station_name) }
+  let(:entry_station) { double :station }
+  let(:exit_station) { double :station }
+  let(:journey){ {entry: entry_station, exit: exit_station} }
   describe '#initialize' do
     it 'initialized with balance of 0' do
       expect(card.balance).to eq 0
@@ -14,6 +16,10 @@ describe Oystercard do
 
     it 'initializes not in journey' do
       expect(card).not_to be_in_journey
+    end
+
+    it 'initializes with empty list of journeys' do
+      expect(card.journey_list).to be_empty
     end
   end
 
@@ -32,41 +38,62 @@ describe Oystercard do
   describe '#touch_in' do
     it 'sets the card to be in journey' do
       card.top_up(min_fare * 2)
-      card.touch_in(station_name)
+      card.touch_in(entry_station)
       expect(card).to be_in_journey
     end
 
     it 'raises an error when balance is below #{min_fare}' do
       message = 'Insufficient funds to travel.'
-      expect { card.touch_in(station_name) }.to raise_error message
+      expect { card.touch_in(entry_station) }.to raise_error message
     end
 
     it 'records an entry station' do
       card.top_up(min_fare)
-      card.touch_in(station_name)
-      expect(card.entry_station).to eq station_name
+      card.touch_in(entry_station)
+      expect(card.entry_station).to eq entry_station
     end
   end
 
   describe '#touch_out' do
     it 'sets the card to be not in journey' do
-      card.touch_out
+      card.touch_out(exit_station)
       expect(card).not_to be_in_journey
     end
 
     it 'deducts minimum fare from balance' do
       card.top_up(10)
-      card.touch_in(station_name)
-      expect { card.touch_out }.to change { card.balance }.by -min_fare
+      card.touch_in(entry_station)
+      expect { card.touch_out(exit_station) }.to change { card.balance }.by -min_fare
     end
 
     it 'set entry station to nil' do
       card.top_up(min_fare)
-      card.touch_in(station_name)
-      card.touch_out
-
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
+      
       expect(card.entry_station).to eq nil
-
+      
     end
   end
+  
+  describe '#journeys' do
+    
+    before do
+      card.top_up(10)
+    end
+
+    it 'touching in and out return one journey' do
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
+      expect(card.journey).to eq journey
+    end
+
+    it 'returns a list of journeys' do
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.journey_list).to include journey
+    end
+
+  end
+
 end
