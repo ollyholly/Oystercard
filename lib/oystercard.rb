@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
+require 'journey'
+
 class Oystercard
   attr_accessor :balance, :entry_station, :journey_list, :journey
 
   MAX_BALANCE = 90
-  MIN_FARE = 1 # min_fare would be equivalent to min_balance
+  MIN_FARE = 1
+  MAX_FARE = 6
 
   def initialize
     @balance = 0
     @entry_station = nil
     @journey_list = []
-    @journey = { entry: nil, exit: nil }
+    @journey = Journey.new
   end
 
   def top_up(amount)
@@ -23,13 +26,13 @@ class Oystercard
     raise 'Insufficient funds to travel.' if insufficient_balance?
 
     self.entry_station = station
-    journey[:entry] = station
+    journey.entry_station = station
   end
 
   def touch_out(station)
     deduct(MIN_FARE)
     self.entry_station = nil
-    journey[:exit] = station
+    journey.exit_station = station
     journey_list << journey
   end
 
