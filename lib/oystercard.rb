@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'journey'
+require_relative 'journey'
+require_relative 'station'
 
 class Oystercard
   attr_accessor :balance, :entry_station, :journey_list, :journey
@@ -25,15 +26,16 @@ class Oystercard
   def touch_in(station)
     raise 'Insufficient funds to travel.' if insufficient_balance?
 
+    double_tap_in if @journey.entry_station != nil
     self.entry_station = station
     journey.entry_station = station
   end
 
   def touch_out(station)
-    deduct(MIN_FARE)
-    self.entry_station = nil
     journey.exit_station = station
+    deduct(@journey.calc_fare)
     journey_list << journey
+    @journey = Journey.new
   end
 
   def in_journey?
@@ -52,5 +54,11 @@ class Oystercard
 
   def over_maximum?(amount)
     self.balance + amount > MAX_BALANCE
+  end
+
+  def double_tap_in
+    deduct(@journey.calc_fare)
+    @journey_list << @journey
+    @journey = Journey.new
   end
 end

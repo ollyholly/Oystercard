@@ -53,6 +53,12 @@ describe Oystercard do
       card.touch_in(entry_station)
       expect(card.entry_station).to eq entry_station
     end
+
+    it 'touching in twice will charge the £6 penalty fare' do
+      card.top_up(30)
+      card.touch_in(entry_station)
+      expect { card.touch_in(entry_station) }.to change { card.balance }.by -6
+    end
   end
 
   describe '#touch_out' do
