@@ -15,10 +15,6 @@ describe Oystercard do
       expect(card.balance).to eq 0
     end
 
-    it 'initializes not in journey' do
-      expect(card).not_to be_in_journey
-    end
-
     it 'initializes with empty list of journeys' do
       expect(card.journey_list).to be_empty
     end
@@ -37,11 +33,6 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-    it 'sets the card to be in journey' do
-      card.top_up(min_fare * 2)
-      card.touch_in(entry_station)
-      expect(card).to be_in_journey
-    end
 
     it 'raises an error when balance is below #{min_fare}' do
       message = 'Insufficient funds to travel.'
@@ -62,10 +53,6 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
-    it 'sets the card to be not in journey' do
-      card.touch_out(exit_station)
-      expect(card).not_to be_in_journey
-    end
 
     it 'deducts minimum fare from balance' do
       card.top_up(10)

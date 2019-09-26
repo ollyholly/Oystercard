@@ -1,20 +1,18 @@
 # frozen_string_literal: true
 
-require_relative 'journey'
+require_relative 'journey_log'
 require_relative 'station'
 
 class Oystercard
-  attr_accessor :balance, :entry_station, :journey_list, :journey
+  attr_reader :balance, :journey_log
 
   MAX_BALANCE = 90
   MIN_FARE = 1
   MAX_FARE = 6
 
-  def initialize
+  def initialize(journey_log = JourneyLog.new)
     @balance = 0
-    @entry_station = nil
-    @journey_list = []
-    @journey = Journey.new
+    @journey_log = journey_log
   end
 
   def top_up(amount)
@@ -24,28 +22,31 @@ class Oystercard
   end
 
   def touch_in(station)
+    penalty_charge if in_journey?
     raise 'Insufficient funds to travel.' if insufficient_balance?
 
-    double_tap_in if @journey.entry_station != nil
-    self.entry_station = station
-    journey.entry_station = station
+    journey_log.start(station)
   end
 
   def touch_out(station)
-    journey.exit_station = station
-    deduct(@journey.calc_fare)
-    journey_list << journey
-    @journey = Journey.new
-  end
-
-  def in_journey?
-    !entry_station.nil?
+    journey_log.finish(station)
+    regular_charge
   end
 
   private
 
+  def charge
+    deduct(journey_log.fare)
+  end
+
+  def penalty_charge
+    journey_log.finalise_journey
+    deduct(journey_log.fare)
+    "Deducted penalty charge of £#{MAX_FARE} for not touching in or out"
+  end
+
   def deduct(amount)
-    self.balance -= amount
+    @balance -= amount
   end
 
   def insufficient_balance?
@@ -56,9 +57,7 @@ class Oystercard
     self.balance + amount > MAX_BALANCE
   end
 
-  def double_tap_in
-    deduct(@journey.calc_fare)
-    @journey_list << @journey
-    @journey = Journey.new
+  def in_journey?
+    journey_log.in_journey?
   end
 end
