@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'journey'
-
 class JourneyLog
-  attr_accessor :journey_list
+  attr_reader :journey_class, :journey_list
+  attr_accessor :current_journey
 
   def initialize(journey_class = Journey)
     @journey_class = journey_class
-    @current_journey = nil
     @journey_list = []
+    @current_journey = journey_class.new
   end
 
   def start(station)
@@ -17,7 +16,6 @@ class JourneyLog
 
   def finish(station)
     current_journey.end(station)
-    finalise_journey
   end
 
   def fare
@@ -25,17 +23,15 @@ class JourneyLog
   end
 
   def in_journey?
-    !!@current_journey
+    !current_journey.entry_station.nil? || !current_journey.exit_station.nil?
   end
 
   def finalise_journey
     @journey_list << current_journey
-    @current_journey = nil
+    @current_journey = journey_class.new
   end
 
-  private
-
-  def current_journey
-    @current_journey ||= @journey_class.new
-  end
+  # def current_journey
+  #   @current_journey ||= journey_class.new
+  # end
 end

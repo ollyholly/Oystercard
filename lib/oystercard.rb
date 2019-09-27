@@ -2,6 +2,7 @@
 
 require_relative 'journey_log'
 require_relative 'station'
+require_relative 'journey'
 
 class Oystercard
   attr_reader :balance, :journey_log
@@ -18,11 +19,11 @@ class Oystercard
   def top_up(amount)
     raise "Maximum balance is #{MAX_BALANCE}." if over_maximum?(amount)
 
-    self.balance += amount
+    @balance += amount
   end
 
   def touch_in(station)
-    penalty_charge if in_journey?
+    charge if in_journey?
     raise 'Insufficient funds to travel.' if insufficient_balance?
 
     journey_log.start(station)
@@ -30,19 +31,14 @@ class Oystercard
 
   def touch_out(station)
     journey_log.finish(station)
-    regular_charge
+    charge
   end
 
   private
 
   def charge
-    deduct(journey_log.fare)
-  end
-
-  def penalty_charge
     journey_log.finalise_journey
     deduct(journey_log.fare)
-    "Deducted penalty charge of £#{MAX_FARE} for not touching in or out"
   end
 
   def deduct(amount)
@@ -50,11 +46,11 @@ class Oystercard
   end
 
   def insufficient_balance?
-    self.balance < MIN_FARE
+    balance < MIN_FARE
   end
 
   def over_maximum?(amount)
-    self.balance + amount > MAX_BALANCE
+    balance + amount > MAX_BALANCE
   end
 
   def in_journey?

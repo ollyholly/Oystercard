@@ -17,14 +17,24 @@ class Journey
   end
 
   def calc_fare
-    return Oystercard::MAX_FARE if incomplete?
-
-    Oystercard::MIN_FARE
+    if incomplete?
+      penalty
+    else
+      Oystercard::MIN_FARE + zone_charge
+    end
   end
 
   private
 
   def incomplete?
     entry_station.nil? || exit_station.nil?
+  end
+
+  def zone_charge
+    (entry_station.zone - exit_station.zone).abs
+  end
+
+  def penalty
+    Oystercard::MAX_FARE
   end
 end

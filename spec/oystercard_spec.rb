@@ -10,13 +10,15 @@ describe Oystercard do
   let(:exit_station) { double :station }
   # let(:journey){ {entry: entry_station, exit: exit_station} }
   let(:journey) { double(:journey, entry_station: nil, exit_station: nil) }
+  let(:journey_log) { double :journey_log }
+
   describe '#initialize' do
     it 'initialized with balance of 0' do
       expect(card.balance).to eq 0
     end
 
-    it 'initializes with empty list of journeys' do
-      expect(card.journey_list).to be_empty
+    xit 'initializes with empty list of journeys' do
+      expect(card.journey_log).to 
     end
   end
 
@@ -33,16 +35,9 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-
     it 'raises an error when balance is below #{min_fare}' do
       message = 'Insufficient funds to travel.'
       expect { card.touch_in(entry_station) }.to raise_error message
-    end
-
-    it 'records an entry station' do
-      card.top_up(min_fare)
-      card.touch_in(entry_station)
-      expect(card.entry_station).to eq entry_station
     end
 
     it 'touching in twice will charge the £6 penalty fare' do
@@ -53,33 +48,10 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
-
     it 'deducts minimum fare from balance' do
       card.top_up(10)
       card.touch_in(entry_station)
       expect { card.touch_out(exit_station) }.to change { card.balance }.by -min_fare
     end
   end
-
-  # describe '#journeys' do
-  #   before do
-  #     card.top_up(10)
-  #   end
-
-  #   it 'touching in and out return one journey' do
-  #     card.touch_in(entry_station)
-  #     card.touch_out(exit_station)
-  #     # allow(journey).to receive(:entry_station).with(entry_station)
-  #     # allow(journey).to receive(:exit_station).with(entry_station)
-  #     expect(card.journey).to eq journey
-  #   end
-
-  #   it 'returns a list of journeys' do
-  #     subject.touch_in(entry_station)
-  #     subject.touch_out(exit_station)
-  #     # allow(journey).to receive(:entry_station).with(entry_station)
-  #     # allow(journey).to receive(:exit_station).with(entry_station)
-  #     expect(subject.journey_list).to include journey
-  #   end
-  # end
 end
