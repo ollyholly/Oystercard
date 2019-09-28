@@ -30,8 +30,4 @@ class JourneyLog
     @journey_list << current_journey
     @current_journey = journey_class.new
   end
-
-  # def current_journey
-  #   @current_journey ||= journey_class.new
-  # end
 end

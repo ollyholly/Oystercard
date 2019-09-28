@@ -44,6 +44,7 @@ describe JourneyLog do
       allow(journey).to receive(:end).with(exit_station)
       journey_log.start(entry_station)
       journey_log.finish(exit_station)
+      journey_log.finalise_journey
       expect(journey_log.journey_list).to include journey
     end
 
@@ -56,7 +57,4 @@ describe JourneyLog do
     end
   end
 
-  # "calculates the charges of all incomplete journeys"
-  # "closes incomplete journeys"
-  # 'init an empty history if no journeys were completed'
 end
